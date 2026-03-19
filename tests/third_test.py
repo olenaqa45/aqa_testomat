@@ -1,5 +1,6 @@
 from playwright.sync_api import Page, expect
 
+#check that Start for free button2 is functional on #welcome_section. Open in New page
 def test_start_for_free_2(page: Page):
     page.goto("https://testomat.io")
     expect(page).to_have_title('AI Test Management Tool | Testomat.io')
@@ -10,6 +11,7 @@ def test_start_for_free_2(page: Page):
     new_page.wait_for_load_state()
     expect(new_page).to_have_url("https://app.testomat.io/users/sign_up")
 
+#check that Start for free button2 is functional on #welcome_section. Open in the same tab
 def test_start_for_free_3(page: Page):
     page.goto("https://testomat.io")
     expect(page).to_have_title('AI Test Management Tool | Testomat.io')
