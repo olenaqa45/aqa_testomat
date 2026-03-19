@@ -1,20 +1,9 @@
 from playwright.sync_api import Page, expect
 
 
-def test_open_home_page(page: Page):
+def test_start_for_free(page: Page):
     page.goto("https://testomat.io")
-
-    expect(page.locator("[href*='sign_in'].login-item")).to_be_visible()
-
-    page.get_by_text("Log in",exact=True).click()
-
-    #page.get_by_role("textbox",name="name@email.com")
-    page.locator("#content-desktop #user_email").fill("olena.qa45@gmail.com")
-    page.locator("#content-desktop #user_password").fill("asdhdfdhtdh")
-    page.get_by_role("button", name="Sign in").click()
-
-    expect(page.locator("#content-desktop").get_by_text("Invalid Email or password.")).to_be_visible()
-    expect(page.locator("#content-desktop .common-flash-info").get_by_text("Invalid Email or password.")).to_be_visible()
-
-    #expect(page).to_have_title('AI Test Management Tool | Testomat.io') #Assertion error
-    expect(page).to_have_title('Testomat.io')
+    expect(page).to_have_title('AI Test Management Tool | Testomat.io')
+    page.locator("#header").get_by_role("link", name="Start for free").click()
+    expect(page).to_have_url("https://app.testomat.io/users/sign_up")
+    #expect(page).to_have_title('Testomat.io')
