@@ -1,12 +1,13 @@
 from playwright.sync_api import (Page, expect)
 
+
 def test_login_with_invalid_creds(page: Page):
     # arrange
     open_home_page(page)
     expect(page.locator("[href*='sign_in'].login-item")).to_be_visible()
 
     # act
-    page.get_by_text("Log in",exact=True).click()
+    page.get_by_text("Log in", exact=True).click()
     login_user(page, "olena.qa45@gmail.com", "awwqedfcdfdf1!s")
 
     # assert
