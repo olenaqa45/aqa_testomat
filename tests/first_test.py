@@ -35,7 +35,7 @@ def test_search_project_in_company(page: Page):
 def test_should_be_possible_to_open_free_project(page: Page):
     # arrange
     page.goto("https://app.testomat.io/users/sign_in")
-    login_user(page, "olena.qa45@gmail.com", "oll123Oll#testnew")
+    login_user(page, "olena.qa45@gmail.com", "fkjhadfgnj")
     # act
     page.locator("#company_id").click()
     page.locator("#company_id").select_option("Free Projects")
@@ -50,7 +50,7 @@ def test_should_be_possible_to_open_free_project(page: Page):
 # create new project some broken test
 # def test_create_new_project(page: Page):
 # page.goto("https://app.testomat.io/users/sign_in")
-# login_user(page, "olena.qa45@gmail.com", "oll123Oll#testnew")
+# login_user(page, "olena.qa45@gmail.com", "fkjhadfgnj")
 
 # page.locator("#company_id").click()
 # page.locator("#company_id").select_option("Free Projects")
