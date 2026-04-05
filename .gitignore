@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 .ai/
 auth_state.json
+.env
