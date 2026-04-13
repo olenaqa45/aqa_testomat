@@ -37,7 +37,7 @@ def test_login_page_is_loaded(page: Page):
     login_page.open()
     login_page.is_loaded()
 
-
+# AI Generated
 def test_forgot_password_link(page: Page):
     login_page = LoginPage(page)
     login_page.open()
