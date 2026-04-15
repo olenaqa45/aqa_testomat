@@ -16,7 +16,7 @@ class ProjectsPage:
         self.plan_tooltip = self._header.locator(".tooltip-project-plan")
         self.project_names = self._container.locator("#grid li h3")
         self.search_input = self._container.locator('input#search[name="search"]')
-        self.project_items = self._container.locator("#grid li")
+        self.project_items = self._container.locator("#grid li").locator("visible=true")
         self.create_btn = self._container.locator('a[href="/projects/new"]')
         self.grid_view_btn = self._container.locator("#grid-view")
         self.table_view_btn = self._container.locator("#table-view")
