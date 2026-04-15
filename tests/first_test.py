@@ -4,9 +4,11 @@ import pytest
 from faker import Faker
 from playwright.sync_api import (Page, expect)
 
+from tests.conftest import Config
+
 
 @pytest.fixture(scope="function")
-def login(page: Page, configs):
+def login(page: Page, configs:Config):
     page.goto(configs.login_url)
     login_user(page, configs.email, configs.password)
 
