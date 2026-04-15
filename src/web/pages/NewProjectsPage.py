@@ -2,7 +2,7 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from web.pages.NewProject import NewProject
+from web.pages.ProjectPage import ProjectPage
 
 
 class NewProjectsPage:
@@ -11,34 +11,44 @@ class NewProjectsPage:
         self._container = page.locator("#content-desktop")
         self._form = self._container.locator("form#new_project")
 
+        # Locators
+        self.page_title = self._container.locator(".common-page-header h2")
+        self.classical_btn = self._form.locator("#classical")
+        self.bdd_btn = self._form.locator("#bdd")
+        self.project_title_input = self._form.locator("#project_title")
+        self.demo_btn = self._form.locator("#demo-btn")
+        self.create_btn = self._form.locator('#project-create-btn input[type="submit"]')
+        self.create_demo_btn = self._container.locator('form[action="/projects/create_demo"] input[type="submit"]')
+        self.how_to_start_link = self._container.locator("a", has_text="How to start?")
+
     def open(self) -> Self:
         self.page.goto("/projects/new")
         return self
 
     def is_loaded(self) -> Self:
-        expect(self._container.locator(".common-page-header h2")).to_have_text("New Project")
+        expect(self.page_title).to_have_text("New Project")
         expect(self._form).to_be_visible()
-        expect(self._form.locator("#classical")).to_be_visible()
-        expect(self._form.locator("#bdd")).to_be_visible()
-        expect(self._form.locator("#project_title")).to_be_visible()
-        expect(self._form.locator("#demo-btn")).to_be_visible()
-        expect(self._form.locator("#project-create-btn")).to_be_visible()
+        expect(self.classical_btn).to_be_visible()
+        expect(self.bdd_btn).to_be_visible()
+        expect(self.project_title_input).to_be_visible()
+        expect(self.demo_btn).to_be_visible()
+        expect(self.create_btn).to_be_visible()
         return self
 
     def select_classical(self) -> Self:
-        self._form.locator("#classical").click()
+        self.classical_btn.click()
         return self
 
     def select_bdd(self) -> Self:
-        self._form.locator("#bdd").click()
+        self.bdd_btn.click()
         return self
 
     def fill_project_title(self, title: str) -> Self:
-        self._form.locator("#project_title").fill(title)
+        self.project_title_input.fill(title)
         return self
 
     def toggle_demo_data(self) -> Self:
-        self._form.locator("#demo-btn").click()
+        self.demo_btn.click()
         return self
 
     def select_demo_project(self, name: str) -> Self:
@@ -46,13 +56,13 @@ class NewProjectsPage:
         return self
 
     def click_create(self) -> Self:
-        self._form.locator('#project-create-btn input[type="submit"]').click()
-        return NewProject(self.page)
+        self.create_btn.click()
+        return ProjectPage(self.page)
 
     def click_create_demo(self) -> Self:
-        self._container.locator('form[action="/projects/create_demo"] input[type="submit"]').click()
+        self.create_demo_btn.click()
         return self
 
     def click_how_to_start(self) -> Self:
-        self._container.locator("a", has_text="How to start?").click()
+        self.how_to_start_link.click()
         return self
