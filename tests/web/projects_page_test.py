@@ -1,19 +1,6 @@
-import pytest
-import target
 from playwright.sync_api import Page
 
-from tests.conftest import Config
-from web.pages.LoginPage import LoginPage
 from web.pages.ProjectsPage import ProjectsPage
-
-
-@pytest.fixture(scope="function")
-def login(page: Page, configs: Config):
-    login_page = LoginPage(page)
-    login_page.open()
-    login_page.is_loaded()
-    login_page.login(configs.email, configs.password)
-
 
 PROJECTS_NAME: str = "QA Club Lviv"
 TARGET_PROJECT: str = "Brown PLC"
@@ -30,7 +17,6 @@ def test_projects_page_header(page: Page, login):
     projects_page.switch_to_table_view()
     projects_page.switch_to_grid_view()
 
-    target.project = TARGET_PROJECT
     projects_page.get_project_names()
     projects_page.search_project(TARGET_PROJECT)
     projects_page.count_of_project_visible(1)

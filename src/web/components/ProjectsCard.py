@@ -13,16 +13,16 @@ class ProjectCard:
     def click(self):
         self._card.click()
 
-    def get_test_count_text(self) -> str:
+    def get_test_count_text(self):
         return self._card.locator("p").inner_text()
 
-    def get_badge(self) -> str:
+    def get_badge(self):
         return self._card.locator(".common-badge").inner_text()
 
     def is_visible(self):
         expect(self._card).to_be_visible()
 
-    def get_name(self) -> str:
+    def get_name(self):
         return self._card.get_attribute("title")
 
     def focus(self):
