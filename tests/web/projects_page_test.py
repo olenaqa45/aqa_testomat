@@ -1,8 +1,11 @@
+import pytest
+
 from web.App import App
 
 PROJECTS_NAME: str = "QA Club Lviv"
-TARGET_PROJECT: str = "Jacobson LLC"
+TARGET_PROJECT: str = "Jacobson LLC11"
 
+@pytest.mark.smoke
 def test_projects_page_header(app: App, login):
     app.projects_page.is_loaded()
     app.projects_page.flash_message_visible()

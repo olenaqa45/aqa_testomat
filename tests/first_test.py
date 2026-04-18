@@ -12,7 +12,7 @@ def login(page: Page, configs:Config):
     page.goto(configs.login_url)
     login_user(page, configs.email, configs.password)
 
-TARGET_PROJECT: str = "Brown PLC"
+TARGET_PROJECT: str = "Jacobson LLC"
 
 # check login with invalid creds is not possible
 def test_login_with_invalid_creds(page: Page, configs):

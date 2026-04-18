@@ -1,10 +1,11 @@
+import pytest
 from faker import Faker
 from playwright.sync_api import expect
 
 from tests.conftest import Config
 from web.App import App
 
-
+@pytest.mark.regression
 def test_login_invalid(app: App, configs: Config):
     app.home_page.open()
     app.home_page.is_loaded()
@@ -14,7 +15,7 @@ def test_login_invalid(app: App, configs: Config):
     app.login_page.login(configs.email, Faker().password(length=10))
     app.login_page.invalid_login_message_visible()
 
-
+@pytest.mark.smoke
 def test_login_with_valid_credentials(app: App, configs: Config):
     app.home_page.open()
     app.home_page.is_loaded()
