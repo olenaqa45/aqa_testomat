@@ -26,7 +26,7 @@ class LoginPage:
     def is_loaded(self):
         expect(self.form).to_be_visible()
 
-    def login(self, email: str, password: str):
+    def login_user(self, email: str, password: str):
         self.email_input.fill(email)
         self.password_input.fill(password)
         self.sign_in_btn.click()
