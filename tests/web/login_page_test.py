@@ -1,3 +1,6 @@
+import os
+
+import pytest
 from faker import Faker
 from playwright.sync_api import expect
 
@@ -5,23 +8,88 @@ from tests.conftest import Config
 from web.App import App
 
 
-def test_login_invalid(app: App, configs: Config):
+fake = Faker()
+
+VALID_EMAIL = os.getenv("EMAIL")
+VALID_PASSWORD = os.getenv("PASSWORD")
+
+# Equivalence classes & boundary values for EMAIL:
+# Valid class: correct format (user@domain.com)
+# Invalid classes: empty, no @, no domain, spaces, special chars, too long
+EMPTY = ""
+SPACES_ONLY = "   "
+NO_AT = "userexample.com"
+NO_DOMAIN = "user@"
+NO_USER = "@example.com"
+SPECIAL_CHARS_EMAIL = "user!#$%@example.com"
+LONG_EMAIL = fake.pystr(min_chars=255, max_chars=255) + "@test.com"
+SQL_INJECTION = "' OR 1=1 --"
+XSS_INPUT = "<script>alert(1)</script>"
+FAKE_EMAIL = fake.email()
+
+# Equivalence classes & boundary values for PASSWORD:
+# Valid class: correct password (8+ chars typically)
+# Invalid classes: empty, 1 char (boundary min), too short, too long, spaces
+ONE_CHAR_PASSWORD = "a"
+SHORT_PASSWORD = "abc"
+LONG_PASSWORD = fake.pystr(min_chars=256, max_chars=256)
+FAKE_PASSWORD = fake.password(length=10)
+
+invalid_login_data = [
+    # Empty values
+    # pytest.param(EMPTY, EMPTY, id="both_empty"),
+    # pytest.param(EMPTY, VALID_PASSWORD, id="empty_email_valid_password"),
+    pytest.param(VALID_EMAIL, EMPTY, id="valid_email_empty_password"),
+    # pytest.param(SPACES_ONLY, VALID_PASSWORD, id="spaces_email"),
+    # pytest.param(VALID_EMAIL, SPACES_ONLY, id="spaces_password"),
+
+    # Invalid email format
+    # pytest.param(NO_AT, VALID_PASSWORD, id="email_no_at_sign"),
+    # pytest.param(NO_DOMAIN, VALID_PASSWORD, id="email_no_domain"),
+    # pytest.param(NO_USER, VALID_PASSWORD, id="email_no_user"),
+    pytest.param(SPECIAL_CHARS_EMAIL, VALID_PASSWORD, id="email_special_chars"),
+    #
+    # # Boundary: email length
+    pytest.param(LONG_EMAIL, VALID_PASSWORD, id="email_too_long"),
+    #
+    # # Wrong credentials (valid format, wrong values)
+    pytest.param(FAKE_EMAIL, VALID_PASSWORD, id="wrong_email_valid_password"),
+    pytest.param(VALID_EMAIL, FAKE_PASSWORD, id="valid_email_wrong_password"),
+    pytest.param(FAKE_EMAIL, FAKE_PASSWORD, id="wrong_email_wrong_password"),
+
+    # Boundary: password length
+    pytest.param(VALID_EMAIL, ONE_CHAR_PASSWORD, id="password_1_char"),
+    # pytest.param(VALID_EMAIL, SHORT_PASSWORD, id="password_too_short"),
+    # pytest.param(VALID_EMAIL, LONG_PASSWORD, id="password_too_long"),
+
+    # Security
+    pytest.param(SQL_INJECTION, VALID_PASSWORD, id="sql_injection_email"),
+    pytest.param(VALID_EMAIL, SQL_INJECTION, id="sql_injection_password"),
+    pytest.param(XSS_INPUT, VALID_PASSWORD, id="xss_email"),
+    pytest.param(VALID_EMAIL, XSS_INPUT, id="xss_password"),
+]
+
+
+@pytest.mark.regression
+@pytest.mark.parametrize("email, password", invalid_login_data)
+def test_login_invalid(app: App, email: str, password: str):
     app.home_page.open()
     app.home_page.is_loaded()
     app.home_page.click_login()
 
     app.login_page.is_loaded()
-    app.login_page.login(configs.email, Faker().password(length=10))
+    app.login_page.login_user(email, password)
     app.login_page.invalid_login_message_visible()
 
 
+@pytest.mark.smoke
 def test_login_with_valid_credentials(app: App, configs: Config):
     app.home_page.open()
     app.home_page.is_loaded()
     app.home_page.click_login()
 
     app.login_page.is_loaded()
-    app.login_page.login(configs.email, configs.password)
+    app.login_page.login_user(configs.email, configs.password)
 
     app.projects_page.is_loaded()
 

@@ -21,6 +21,9 @@ class ProjectsPage:
         self.grid_view_btn = self._container.locator("#grid-view")
         self.table_view_btn = self._container.locator("#table-view")
 
+    def open(self):
+        self.page.goto("/")
+
     def is_loaded(self):
         expect(self.page_title).to_have_text("Projects")
 

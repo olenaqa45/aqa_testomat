@@ -1,17 +1,19 @@
+import pytest
 from faker.proxy import Faker
 
 from web.App import App
 
 
-def test_new_project_page_elements(app: App, login):
-    app.new_projects_page.open()
-    app.new_projects_page.is_loaded()
+def test_new_project_page_elements(login: App):
+    login.new_projects_page.open()
+    login.new_projects_page.is_loaded()
 
 
-def test_new_project_creation(app: App, login):
+@pytest.mark.smoke
+def test_new_project_creation(login: App):
     target_project_name = Faker().company()
 
-    (app.new_projects_page
+    (login.new_projects_page
      .open()
      .is_loaded()
      .select_classical()
@@ -19,13 +21,13 @@ def test_new_project_creation(app: App, login):
      .click_create()
      )
 
-    (app.project_page
+    (login.project_page
      .is_loaded()
      .empty_project_name_is(target_project_name)
      .close_read_me_left()
      )
 
-    (app.project_page.side_bar
+    (login.project_page.side_bar
      .open()
      .is_loaded()
      .click_logo()

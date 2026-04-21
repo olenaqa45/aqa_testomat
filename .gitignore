@@ -6,3 +6,4 @@ __pycache__/
 auth_state.json
 .env
 /src/data_type_experiments/
+/test-result/

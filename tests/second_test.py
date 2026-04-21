@@ -9,7 +9,9 @@ LOGIN_URL = os.getenv("BASE_APP_URL") + "/users/sign_in"
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 
-EXPECTED_TITLE = "AI Test Management Solutions & Automated Testing Tool | Testomat"
+# EXPECTED_TITLE = "AI Test Management Solutions & Automated Testing Tool | Testomat"
+EXPECTED_TITLE = "AI Test Management Tool & Platform | QA Software Testomat.io"
+TARGET_PROJECT: str = "Jacobson LLC"
 
 
 # check that Start for free button is functional on the header
@@ -50,14 +52,14 @@ def test_search_project_in_company(page: Page):
     login_user(page, EMAIL, PASSWORD)
 
     # act
-    target_project = "Brown PLC"
-    search_for_project(page, target_project)
+    search_for_project(page, TARGET_PROJECT)
+
 
     # assert
-    expect(page.get_by_title(target_project)).to_be_visible()
-    expect(page.get_by_role("heading", name=target_project)).to_be_visible()
-    expect(page.locator("ul li h3", has_text=target_project)).to_be_visible()
-    expect(page.locator("ul li h3").filter(has_text=target_project)).to_have_text(target_project)
+    expect(page.get_by_title(TARGET_PROJECT)).to_be_visible()
+    expect(page.get_by_role("heading", name=TARGET_PROJECT)).to_be_visible()
+    expect(page.locator("ul li h3", has_text=TARGET_PROJECT)).to_be_visible()
+    expect(page.locator("ul li h3").filter(has_text=TARGET_PROJECT)).to_have_text(TARGET_PROJECT)
 
 
 # assigned functions
