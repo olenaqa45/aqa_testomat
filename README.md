@@ -9,6 +9,8 @@ UI test automation framework for [Testomat.io](https://testomat.io) built with P
 - pytest 9.0
 - Faker (test data generation)
 - python-dotenv (environment config)
+- uv (package manager)
+- Ruff (linter & formatter)
 
 ## Project Structure
 
@@ -35,8 +37,7 @@ aqa_testomat/
 │   │   └── project_creation_test.py # Project creation flow
 │   ├── login_and_projects_test.py  # Legacy login & project search tests
 │   └── homepage_test.py            # Marketing site tests
-├── pytest.ini                      # pytest configuration
-├── requirements.txt
+├── pyproject.toml                  # Project config, dependencies, pytest & ruff settings
 └── .env                            # Environment variables (not committed)
 ```
 
@@ -45,6 +46,7 @@ aqa_testomat/
 ### Prerequisites
 
 - Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (package manager)
 - Git
 
 ### Installation
@@ -53,11 +55,8 @@ aqa_testomat/
 git clone <repo-url>
 cd aqa_testomat
 
-python -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-playwright install chromium
+uv sync
+uv run playwright install chromium
 ```
 
 ### Environment Variables

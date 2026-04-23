@@ -1,0 +1,88 @@
+[project]
+name = "aqa-testomat"
+version = "0.1.0"
+description = "UI test automation framework for Testomat.io"
+requires-python = ">=3.14"
+dependencies = [
+    "faker==40.12.0",
+    "playwright==1.58.0",
+    "pytest==9.0.2",
+    "pytest-html>=4.2.0",
+    "pytest-playwright==0.7.2",
+    "python-dotenv==1.2.2",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["*_test.py", "test_*.py", "*_tests.py"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "-ra",
+    "--strict-markers",
+    "--tb=short",
+    "--headed",
+    "--tracing=retain-on-failure",
+    "--screenshot=on",
+    "--output=test-result/traces",
+    "--html=test-result/report.html",
+]
+base_url = "https://app.testomat.io"
+pythonpath = ["src"]
+markers = [
+    "smoke: quick critical path tests",
+    "regression: full regression suite",
+]
+console_output_style = "progress"
+log_cli = true
+log_cli_level = "INFO"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.11",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "test-result",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "UP",
+    "SIM",
+    "RUF",
+]
+ignore = [
+    "E501",
+    "B008",
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "tests"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = false
