@@ -5,7 +5,7 @@ import pytest
 from dotenv import load_dotenv
 from playwright.sync_api import Page, Browser, BrowserContext, Playwright
 
-from web.App import App
+from web.app import App
 
 load_dotenv()
 
@@ -49,9 +49,9 @@ def storage_state(browser: Browser, configs: Config) -> str:
     page = context.new_page()
     app = App(page)
     app.login_page.open()
-    app.login_page.is_loaded()
+    app.login_page.should_be_loaded()
     app.login_page.login_user(configs.email, configs.password)
-    app.projects_page.is_loaded()
+    app.projects_page.should_be_loaded()
     context.storage_state(path=STORAGE_STATE_PATH)
     page.close()
     context.close()
@@ -84,7 +84,7 @@ def app(page: Page) -> App:
 
 
 @pytest.fixture(scope="function")
-def login(browser: Browser, storage_state: str):
+def authenticated_app(browser: Browser, storage_state: str):
     context = browser.new_context(
         base_url=os.getenv("BASE_APP_URL"),
         viewport={"width": 1920, "height": 1080},

@@ -1,6 +1,8 @@
+from typing import Self
+
 from playwright.sync_api import Page, expect
 
-from web.components.ProjectsCard import ProjectCard
+from web.components.projects_card import ProjectCard
 
 
 class ProjectsPage:
@@ -21,39 +23,49 @@ class ProjectsPage:
         self.grid_view_btn = self._container.locator("#grid-view")
         self.table_view_btn = self._container.locator("#table-view")
 
-    def open(self):
+    def open(self) -> Self:
         self.page.goto("/")
+        return self
 
-    def is_loaded(self):
+    def should_be_loaded(self) -> Self:
         expect(self.page_title).to_have_text("Projects")
+        return self
 
-    def flash_message_visible(self, text: str = "Signed in successfully"):
+    def flash_message_visible(self, text: str = "Signed in successfully") -> Self:
         expect(self.flash_success.filter(has_text=text)).to_be_visible()
+        return self
 
-    def select_projects_name(self, projects_name: str):
+    def select_projects_name(self, projects_name: str) -> Self:
         self.company_select.click()
         self.company_select.select_option(label=projects_name)
+        return self
 
-    def enterprise_plan_is_visible(self, plan_name: str):
+    def enterprise_plan_is_visible(self, plan_name: str) -> Self:
         expect(self.plan_tooltip.filter(has_text=plan_name)).to_be_visible()
+        return self
 
-    def get_project_names(self):
+    def get_project_names(self) -> list[str]:
         return self.project_names.all_inner_texts()
 
-    def search_project(self, name: str):
+    def search_project(self, name: str) -> Self:
         self.search_input.fill(name)
+        return self
 
-    def count_of_project_visible(self, expected: int):
+    def count_of_project_visible(self, expected: int) -> Self:
         expect(self.project_items).to_have_count(expected)
+        return self
 
     def get_project_card(self, name: str) -> ProjectCard:
         return ProjectCard(self.page, name)
 
-    def click_create(self):
+    def click_create(self) -> Self:
         self.create_btn.click()
+        return self
 
-    def switch_to_grid_view(self):
+    def switch_to_grid_view(self) -> Self:
         self.grid_view_btn.click()
+        return self
 
-    def switch_to_table_view(self):
+    def switch_to_table_view(self) -> Self:
         self.table_view_btn.click()
+        return self

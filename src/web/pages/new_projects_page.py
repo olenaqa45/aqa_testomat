@@ -2,7 +2,7 @@ from typing import Self
 
 from playwright.sync_api import Page, expect
 
-from web.pages.ProjectPage import ProjectPage
+from web.pages.project_page import ProjectPage
 
 
 class NewProjectsPage:
@@ -25,7 +25,7 @@ class NewProjectsPage:
         self.page.goto("/projects/new")
         return self
 
-    def is_loaded(self) -> Self:
+    def should_be_loaded(self) -> Self:
         expect(self.page_title).to_have_text("New Project")
         expect(self._form).to_be_visible()
         expect(self.classical_btn).to_be_visible()
@@ -55,7 +55,7 @@ class NewProjectsPage:
         self._container.locator("#demo-form button", has_text=name).click()
         return self
 
-    def click_create(self) -> Self:
+    def click_create(self) -> ProjectPage:
         self.create_btn.click()
         return ProjectPage(self.page)
 
