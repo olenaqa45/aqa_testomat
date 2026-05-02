@@ -30,30 +30,30 @@ def test_login_with_invalid_creds(page: Page, configs: Config):
 
 
 @pytest.mark.smoke
-def test_search_project_in_company(authenticated_app: App):
-    authenticated_app.projects_page.open().should_be_loaded()
-    authenticated_app.projects_page.search_project(TARGET_PROJECT)
+def test_search_project_in_company(logged_app: App):
+    logged_app.projects_page.open().should_be_loaded()
+    logged_app.projects_page.search_project(TARGET_PROJECT)
 
-    expect(authenticated_app.page.get_by_title(TARGET_PROJECT)).to_be_visible()
-    expect(authenticated_app.page.get_by_role("heading", name=TARGET_PROJECT)).to_be_visible()
-
-
-@pytest.mark.regression
-def test_should_be_possible_to_open_free_project(authenticated_app: App):
-    authenticated_app.projects_page.open().should_be_loaded()
-    authenticated_app.projects_page.select_projects_name("Free Projects")
-    authenticated_app.projects_page.search_project(TARGET_PROJECT)
-
-    expect(authenticated_app.page.get_by_role("heading", name=TARGET_PROJECT)).to_be_hidden()
-    expect(authenticated_app.page.get_by_text("You have not created any projects yet")).to_be_visible(timeout=10000)
+    expect(logged_app.page.get_by_title(TARGET_PROJECT)).to_be_visible()
+    expect(logged_app.page.get_by_role("heading", name=TARGET_PROJECT)).to_be_visible()
 
 
 @pytest.mark.regression
-def test_create_project_button_visible(authenticated_app: App):
-    authenticated_app.projects_page.open().should_be_loaded()
-    authenticated_app.projects_page.select_projects_name("Free Projects")
+def test_should_be_possible_to_open_free_project(logged_app: App):
+    logged_app.projects_page.open().should_be_loaded()
+    logged_app.projects_page.select_projects_name("Free Projects")
+    logged_app.projects_page.search_project(TARGET_PROJECT)
 
-    expect(authenticated_app.page.get_by_role("link", name="Create project")).to_be_visible()
+    expect(logged_app.page.get_by_role("heading", name=TARGET_PROJECT)).to_be_hidden()
+    expect(logged_app.page.get_by_text("You have not created any projects yet")).to_be_visible(timeout=10000)
+
+
+@pytest.mark.regression
+def test_create_project_button_visible(logged_app: App):
+    logged_app.projects_page.open().should_be_loaded()
+    logged_app.projects_page.select_projects_name("Free Projects")
+
+    expect(logged_app.page.get_by_role("link", name="Create project")).to_be_visible()
 
 
 def open_home_page(page: Page) -> None:

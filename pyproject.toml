@@ -7,8 +7,19 @@ dependencies = [
     "faker==40.12.0",
     "playwright==1.58.0",
     "pytest==9.0.2",
+    "pytest-dependency>=0.6.1",
+    "pytest-env>=1.6.0",
+    "pytest-factoryboy>=2.8.1",
+    "pytest-fixture-order>=0.1.5",
+    "pytest-fixtures>=0.1.0",
     "pytest-html>=4.2.0",
+    "pytest-lazy-fixtures>=1.4.0",
+    "pytest-mock>=3.15.1",
+    "pytest-ordering>=0.6",
     "pytest-playwright==0.7.2",
+    "pytest-rerunfailures>=16.1",
+    "pytest-timeout>=2.4.0",
+    "pytest-xdist>=3.8.0",
     "python-dotenv==1.2.2",
 ]
 
@@ -33,7 +44,11 @@ pythonpath = ["src"]
 markers = [
     "smoke: quick critical path tests",
     "regression: full regression suite",
+    "dependency: mark test dependencies (pytest-dependency)",
+    "order: set test execution order (pytest-ordering)",
+    "timeout: set per-test timeout (pytest-timeout)",
 ]
+timeout = 60
 console_output_style = "progress"
 log_cli = true
 log_cli_level = "INFO"

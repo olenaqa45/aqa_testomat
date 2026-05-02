@@ -16,6 +16,8 @@ class ProjectsPage:
         self.flash_success = self._container.locator(".common-flash-success")
         self.company_select = self._header.locator("#company_id")
         self.plan_tooltip = self._header.locator(".tooltip-project-plan")
+        self.enterprise_plan_label = self._container.get_by_text("Enterprise Plan")
+        self.free_plan_label = self._container.get_by_text("Free Plan")
         self.project_names = self._container.locator("#grid li h3")
         self.search_input = self._container.locator('input#search[name="search"]')
         self.project_items = self._container.locator("#grid li").locator("visible=true")
@@ -38,6 +40,10 @@ class ProjectsPage:
     def select_projects_name(self, projects_name: str) -> Self:
         self.company_select.click()
         self.company_select.select_option(label=projects_name)
+        return self
+
+    def hover_plan_tooltip(self) -> Self:
+        self.plan_tooltip.hover(timeout=5000)
         return self
 
     def enterprise_plan_is_visible(self, plan_name: str) -> Self:
