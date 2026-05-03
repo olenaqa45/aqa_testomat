@@ -30,11 +30,19 @@ aqa_testomat/
 │       ├── profile_menu.py         # User profile dropdown
 │       └── header_nav.py           # Top navigation bar
 ├── tests/
-│   ├── conftest.py                 # Fixtures: browser, auth, app
+│   ├── conftest.py                 # Registers fixture plugins
+│   ├── fixtures/
+│   │   ├── config.py               # Config dataclass & configs fixture
+│   │   ├── playwright.py           # Browser, storage states, context, page fixtures
+│   │   └── app.py                  # App fixtures (logged_app, free_project_app)
 │   ├── web/
 │   │   ├── login_page_test.py      # Login page tests (valid/invalid/UI)
-│   │   ├── projects_page_test.py   # Projects page tests
-│   │   └── project_creation_test.py # Project creation flow
+│   │   ├── enterprise_plan_tests/
+│   │   │   ├── projects_page_test.py    # Enterprise projects page tests
+│   │   │   ├── project_creation_test.py # Project creation flow
+│   │   │   └── switch_company_test.py   # Company switching tests
+│   │   └── free_plan_tests/
+│   │       └── free_plan_test.py        # Free plan tests
 │   ├── login_and_projects_test.py  # Legacy login & project search tests
 │   └── homepage_test.py            # Marketing site tests
 ├── pyproject.toml                  # Project config, dependencies, pytest & ruff settings
@@ -86,6 +94,12 @@ pytest tests/web/login_page_test.py
 # Run a single test
 pytest tests/web/login_page_test.py::test_login_invalid
 
+# Run enterprise plan tests
+pytest tests/web/enterprise_plan_tests/
+
+# Run free plan tests
+pytest tests/web/free_plan_tests/
+
 # Rerun last failed
 pytest --lf
 
@@ -101,10 +115,10 @@ pytest --headless
 
 ## Test Markers
 
-| Marker       | Description                  |
-|--------------|------------------------------|
-| `smoke`      | Quick critical path tests    |
-| `regression` | Full regression suite        |
+| Marker       | Description               |
+|--------------|---------------------------|
+| `smoke`      | Quick critical path tests |
+| `regression` | Full regression suite     |
 
 ## Architecture
 
@@ -117,19 +131,36 @@ The project follows the **Page Object Model** pattern:
 
 ### Fixtures
 
-| Fixture              | Scope    | Description                                      |
-|----------------------|----------|--------------------------------------------------|
-| `configs`            | session  | Loads env vars into a `Config` dataclass          |
-| `browser`            | session  | Launches Chromium                                 |
-| `storage_state`      | session  | Authenticates once, saves session to disk          |
-| `context`            | function | Fresh unauthenticated browser context              |
-| `page`               | function | New page from unauthenticated context              |
-| `app`                | function | `App` instance (unauthenticated)                   |
-| `authenticated_app`  | function | `App` instance with saved auth session             |
+Fixtures are split into three files under `tests/fixtures/`:
+
+**config.py** — configuration
+
+| Fixture   | Scope   | Description                              |
+|-----------|---------|------------------------------------------|
+| `configs` | session | Loads env vars into a `Config` dataclass |
+
+**playwright.py** — browser & auth
+
+| Fixture              | Scope    | Description                                              |
+|----------------------|----------|----------------------------------------------------------|
+| `browser`            | session  | Launches Chromium                                        |
+| `storage_state`      | session  | Logs in once, saves enterprise session to disk           |
+| `free_storage_state` | session  | Switches to Free Projects company, saves session to disk |
+| `context`            | function | Fresh unauthenticated browser context                    |
+| `page`               | function | New page from unauthenticated context                    |
+
+**app.py** — app instances
+
+| Fixture            | Scope    | Description                                 |
+|--------------------|----------|---------------------------------------------|
+| `app`              | function | `App` instance (unauthenticated)            |
+| `logged_app`       | function | `App` instance with enterprise auth session |
+| `free_project_app` | function | `App` instance with free plan auth session  |
 
 ## Test Reports
 
 On failure, Playwright captures:
+
 - **Traces** → `test-result/traces/`
 - **Screenshots** → `test-result/traces/`
 - **HTML report** → `test-result/report.html`

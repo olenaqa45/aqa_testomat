@@ -12,7 +12,6 @@ from web.app import App
 if TYPE_CHECKING:
     from tests.conftest import Config
 
-
 fake = Faker()
 
 VALID_EMAIL = os.getenv("EMAIL")
