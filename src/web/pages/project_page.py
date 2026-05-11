@@ -20,6 +20,10 @@ class ProjectPage:
         self.close_readme_right_btn = page.locator(".detail-view-header-wrapper .third-btn")
         self.edit_readme_btn = page.locator(".detail-view-header-wrapper .ember-view")
 
+    def open(self, project_id: str) -> Self:
+        self.page.goto(f"/projects/{project_id}")
+        return self
+
     def should_be_loaded(self) -> Self:
         expect(self.sticky_header).to_be_visible()
         expect(self.nav_menu).to_be_visible()
@@ -44,3 +48,6 @@ class ProjectPage:
     def edit_read_me(self) -> Self:
         expect(self.edit_readme_btn).to_be_visible()
         return self
+
+    def suite_btn_is_visible(self) -> Self:
+        expect(self.suite_btn).to_be_visible()

@@ -5,6 +5,7 @@ description = "UI test automation framework for Testomat.io"
 requires-python = ">=3.14"
 dependencies = [
     "faker==40.12.0",
+    "httpx>=0.28.1",
     "playwright==1.58.0",
     "pytest==9.0.2",
     "pytest-dependency>=0.6.1",
@@ -47,6 +48,9 @@ markers = [
     "dependency: mark test dependencies (pytest-dependency)",
     "order: set test execution order (pytest-ordering)",
     "timeout: set per-test timeout (pytest-timeout)",
+    "web: Web UI tests using Playwright",
+    "api: API tests using requests",
+    "slow: Tests that take longer to execute",
 ]
 timeout = 60
 console_output_style = "progress"
