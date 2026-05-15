@@ -52,7 +52,8 @@ class TestEnterpriseVsFreeCookies:
 class TestCookieManipulation:
     """Test that removing cookies affects app behavior."""
 
-    def test_removing_session_cookie_requires_reauth(self, browser: Browser, storage_state: str):
+    @pytest.fixture()
+    def no_session_app(self, browser: Browser, storage_state: str) -> App:
         modified_state = remove_cookie(storage_state, "_backend_session")
         context = browser.new_context(
             base_url=os.getenv("BASE_APP_URL"),
@@ -60,9 +61,12 @@ class TestCookieManipulation:
             storage_state=modified_state,
         )
         page = context.new_page()
-        app = App(page)
-        app.projects_page.open()
-        expect(app.login_page.page.locator("input[type='email']")).to_be_visible()
+        yield App(page)
         page.close()
         context.close()
         os.unlink(modified_state)
+
+    @pytest.mark.regression
+    def test_removing_session_cookie_requires_reauth(self, no_session_app: App):
+        no_session_app.projects_page.open()
+        expect(no_session_app.login_page.email_input).to_be_visible()

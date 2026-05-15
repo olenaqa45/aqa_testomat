@@ -24,12 +24,7 @@ dependencies = [
     { name = "playwright" },
     { name = "pytest" },
     { name = "pytest-dependency" },
-    { name = "pytest-env" },
-    { name = "pytest-factoryboy" },
-    { name = "pytest-fixture-order" },
-    { name = "pytest-fixtures" },
     { name = "pytest-html" },
-    { name = "pytest-lazy-fixtures" },
     { name = "pytest-mock" },
     { name = "pytest-ordering" },
     { name = "pytest-playwright" },
@@ -47,16 +42,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "faker", specifier = "==40.12.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "httpx", specifier = "==0.28.1" },
     { name = "playwright", specifier = "==1.58.0" },
     { name = "pytest", specifier = "==9.0.2" },
     { name = "pytest-dependency", specifier = ">=0.6.1" },
-    { name = "pytest-env", specifier = ">=1.6.0" },
-    { name = "pytest-factoryboy", specifier = ">=2.8.1" },
-    { name = "pytest-fixture-order", specifier = ">=0.1.5" },
-    { name = "pytest-fixtures", specifier = ">=0.1.0" },
     { name = "pytest-html", specifier = ">=4.2.0" },
-    { name = "pytest-lazy-fixtures", specifier = ">=1.4.0" },
     { name = "pytest-mock", specifier = ">=3.15.1" },
     { name = "pytest-ordering", specifier = ">=0.6" },
     { name = "pytest-playwright", specifier = "==0.7.2" },
@@ -135,18 +125,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bf/89/780e11f9588d9e7128a3f87788354c7946a9cbb1401ad38a48c4db9a4f07/execnet-2.1.2.tar.gz", hash = "sha256:63d83bfdd9a23e35b9c6a3261412324f964c2ec8dcd8d3c6916ee9373e0befcd", size = 166622, upload-time = "2025-11-12T09:56:37.75Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ab/84/02fc1827e8cdded4aa65baef11296a9bbe595c474f0d6d758af082d849fd/execnet-2.1.2-py3-none-any.whl", hash = "sha256:67fba928dd5a544b783f6056f449e5e3931a5c378b128bc18501f7ea79e296ec", size = 40708, upload-time = "2025-11-12T09:56:36.333Z" },
-]
-
-[[package]]
-name = "factory-boy"
-version = "3.3.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "faker" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/98/75cacae9945f67cfe323829fc2ac451f64517a8a330b572a06a323997065/factory_boy-3.3.3.tar.gz", hash = "sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03", size = 164146, upload-time = "2025-02-03T09:49:04.433Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/8d/2bc5f5546ff2ccb3f7de06742853483ab75bf74f36a92254702f8baecc79/factory_boy-3.3.3-py2.py3-none-any.whl", hash = "sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc", size = 37036, upload-time = "2025-02-03T09:49:01.659Z" },
 ]
 
 [[package]]
@@ -232,15 +210,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ce/cc/762dfb036166873f0059f3b7de4565e1b5bc3d6f28a414c13da27e442f99/idna-3.13.tar.gz", hash = "sha256:585ea8fe5d69b9181ec1afba340451fba6ba764af97026f92a91d4eef164a242", size = 194210, upload-time = "2026-04-22T16:42:42.314Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5d/13/ad7d7ca3808a898b4612b6fe93cde56b53f3034dcde235acb1f0e1df24c6/idna-3.13-py3-none-any.whl", hash = "sha256:892ea0cde124a99ce773decba204c5552b69c3c67ffd5f232eb7696135bc8bb3", size = 68629, upload-time = "2026-04-22T16:42:40.909Z" },
-]
-
-[[package]]
-name = "inflection"
-version = "0.5.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e1/7e/691d061b7329bc8d54edbf0ec22fbfb2afe61facb681f9aaa9bff7a27d04/inflection-0.5.1.tar.gz", hash = "sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417", size = 15091, upload-time = "2020-08-22T08:16:29.139Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/91/aa6bde563e0085a02a435aa99b49ef75b0a4b062635e606dab23ce18d720/inflection-0.5.1-py2.py3-none-any.whl", hash = "sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2", size = 9454, upload-time = "2020-08-22T08:16:27.816Z" },
 ]
 
 [[package]]
@@ -392,56 +361,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c2/ea/84509533e0f6477960b8a9179d240d93c909c6543e4dd8209932026d7815/pytest_dependency-0.6.1.tar.gz", hash = "sha256:246c24d2a5fc743a942cec4408853640e56a05ba58d46e5b213a1d4b738a2464", size = 20837, upload-time = "2026-02-15T18:08:43.927Z" }
 
 [[package]]
-name = "pytest-env"
-version = "1.6.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-    { name = "python-dotenv" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ff/69/4db1c30625af0621df8dbe73797b38b6d1b04e15d021dd5d26a6d297f78c/pytest_env-1.6.0.tar.gz", hash = "sha256:ac02d6fba16af54d61e311dd70a3c61024a4e966881ea844affc3c8f0bf207d3", size = 16163, upload-time = "2026-03-12T22:39:43.78Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/16/ad52f56b96d851a2bcfdc1e754c3531341885bd7177a128c13ff2ca72ab4/pytest_env-1.6.0-py3-none-any.whl", hash = "sha256:1e7f8a62215e5885835daaed694de8657c908505b964ec8097a7ce77b403d9a3", size = 10400, upload-time = "2026-03-12T22:39:41.887Z" },
-]
-
-[[package]]
-name = "pytest-factoryboy"
-version = "2.8.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "factory-boy" },
-    { name = "inflection" },
-    { name = "packaging" },
-    { name = "pytest" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/91/8a/a0f9c58bf176b0d39b630a6e29cccebec9a429dfeb62204bbb9b632fb798/pytest_factoryboy-2.8.1.tar.gz", hash = "sha256:2221d48b31b8b8ccaa739c6a162fb50a43a4de6dff6043f249d2807a3462548d", size = 16906, upload-time = "2025-07-01T04:05:38.901Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/2f/4f73a79196b4acb0f902520a805caa22f8ba0adbecdfb028a371404c2537/pytest_factoryboy-2.8.1-py3-none-any.whl", hash = "sha256:91c762cb236bf34b11efdf2e54bafae33114488235621e8b2c4bd9fd77838784", size = 16413, upload-time = "2025-07-01T04:05:37.344Z" },
-]
-
-[[package]]
-name = "pytest-fixture-order"
-version = "0.1.5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8c/79/794b01fbb0d6d8c556cc1d099171ba209fb10b797b140ba933100501f513/pytest_fixture_order-0.1.5.tar.gz", hash = "sha256:25991b4dc2f0cb40655d93886d20de73056bde87196f07abb2b36c78f08ed90b", size = 6205, upload-time = "2025-10-22T19:31:18.673Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/c1/f70caac503b8912be0a6c6ce98cd7dec19bf9b05d2f450ed27194e925259/pytest_fixture_order-0.1.5-py3-none-any.whl", hash = "sha256:ce4ac6b51dca6476dbc1406a61199dfff6352fc5333bd0b52e2d3420487e834a", size = 4845, upload-time = "2025-10-22T19:31:17.895Z" },
-]
-
-[[package]]
-name = "pytest-fixtures"
-version = "0.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f7/25/3b7527e005df1dfe040091c3fc6ce75a0670c8e458773678f96d184b3017/pytest-fixtures-0.1.0.tar.gz", hash = "sha256:28f13dc9fb9206f4a5fba1a100e1b3de20fbfa37a7af440ca07222fa45b85b7b", size = 6305, upload-time = "2019-05-01T21:25:16.944Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/d8/75876c6c77d4f79faaf7ecef0c6532820e4ade5936f4797a8dd4c1ff79db/pytest_fixtures-0.1.0-py3-none-any.whl", hash = "sha256:8372ad1cd6dafd7e53b183b8601d1a85cda7bd829e7f73fae18416e95d270a3e", size = 4937, upload-time = "2019-05-01T21:25:15.542Z" },
-]
-
-[[package]]
 name = "pytest-html"
 version = "4.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -453,18 +372,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c4/08/2076aa09507e51c1119d16a84c6307354d16270558f1a44fc9a2c99fdf1d/pytest_html-4.2.0.tar.gz", hash = "sha256:b6a88cba507500d8709959201e2e757d3941e859fd17cfd4ed87b16fc0c67912", size = 108634, upload-time = "2026-01-19T11:25:26.471Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/84/47/07046e0acedc12fe2bae79cf6c73ad67f51ae9d67df64d06b0f3eac73d36/pytest_html-4.2.0-py3-none-any.whl", hash = "sha256:ff5caf3e17a974008e5816edda61168e6c3da442b078a44f8744865862a85636", size = 23801, upload-time = "2026-01-19T11:25:25.008Z" },
-]
-
-[[package]]
-name = "pytest-lazy-fixtures"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/75/05/030c4efe596bc31bcb4fefb31f5fcefc8917df99bd745a920763c5e81863/pytest_lazy_fixtures-1.4.0.tar.gz", hash = "sha256:f544b60c96b909b307558a62cc1f28f026f11e9f03d7f583a1dc636de3dbcb10", size = 36188, upload-time = "2025-09-16T18:42:31.797Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/60/a0/a07399bd4842282fe3c2da264746069d5216640bc0940b7a359e2c950aa6/pytest_lazy_fixtures-1.4.0-py3-none-any.whl", hash = "sha256:c5db4506fa0ade5887189d1a18857fec4c329b4f49043fef6732c67c9553389a", size = 9680, upload-time = "2025-09-16T18:42:30.534Z" },
 ]
 
 [[package]]
