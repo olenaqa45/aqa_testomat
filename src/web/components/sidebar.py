@@ -1,4 +1,3 @@
-from os import link
 from typing import Self
 
 from playwright.sync_api import Page, expect
@@ -27,14 +26,14 @@ class Sidebar:
 
         self.help_link = self._container.get_by_role("link", name="Help")
         self.projects_link = self._container.get_by_role("link", name="Projects")
-        self.user_profile_link = self._container.get_by_role("link", name="Олена")
+        self.user_profile_link = self._container.locator("a").last
 
     def open(self) -> Self:
         self.open_btn.click(force=True)
         expect(self.page.locator(".mainnav-menu-expanded")).to_be_visible()
         return self
 
-    def is_loaded(self) -> Self:
+    def should_be_loaded(self) -> Self:
         expect(self.tests_link).to_be_visible()
         expect(self.requirements_link).to_be_visible()
         expect(self.runs_link).to_be_visible()
