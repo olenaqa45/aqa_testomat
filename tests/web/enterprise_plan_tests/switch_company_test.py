@@ -15,4 +15,6 @@ def test_projects_page_header_free_project(logged_app: App) -> None:
     logged_app.projects_page.free_plan_label.hover(timeout=500)
     # logged_app.page.pause()
     expect(logged_app.page.get_by_text("You have a free subscription")).to_be_visible()
-    logged_app.page.context.storage_state(path="test-result/.free_auth.json")
+    from tests.fixtures.playwright import FREE_STORAGE_STATE_PATH
+
+    logged_app.page.context.storage_state(path=FREE_STORAGE_STATE_PATH)

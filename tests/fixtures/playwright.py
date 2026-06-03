@@ -7,9 +7,10 @@ from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 from tests.fixtures.config import Config
 from web.app import App
 
-STORAGE_STATE_PATH = "test-result/.auth.json"
-FREE_STORAGE_STATE_PATH = "test-result/.free_auth.json"
-TRACES_DIR = Path("test-result/traces")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+STORAGE_STATE_PATH = str(PROJECT_ROOT / "test-result" / ".auth.json")
+FREE_STORAGE_STATE_PATH = str(PROJECT_ROOT / "test-result" / ".free_auth.json")
+TRACES_DIR = PROJECT_ROOT / "test-result" / "traces"
 
 
 @pytest.fixture(scope="session")
@@ -106,11 +107,10 @@ def save_video(page: Page, request: pytest.FixtureRequest) -> None:
 
 
 @pytest.fixture(scope="function")
-def context(browser: Browser, request: pytest.FixtureRequest) -> BrowserContext:
+def context(browser: Browser) -> BrowserContext:
     context = _create_context(browser)
     start_tracing(context)
     yield context
-    stop_tracing(context, request)
     context.close()
 
 
@@ -121,5 +121,6 @@ def page(context: BrowserContext, request: pytest.FixtureRequest) -> Page:
     try:
         save_screenshot(page, request)
     finally:
+        stop_tracing(context, request)
         page.close()
         save_video(page, request)
