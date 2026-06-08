@@ -14,6 +14,7 @@ class Config:
     email: str
     password: str
     api_token: str
+    project_id: str
 
 
 @pytest.fixture(scope="session")
@@ -24,4 +25,5 @@ def configs() -> Config:
         email=os.getenv("EMAIL"),
         password=os.getenv("PASSWORD"),
         api_token=os.getenv("API_TOKEN"),
+        project_id=os.getenv("PROJECT_ID", ""),
     )
