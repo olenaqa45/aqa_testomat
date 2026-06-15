@@ -1,0 +1,24 @@
+# Composite action that encapsulates the common setup steps
+# reused across all workflows (ci.yml, api.yml, etc.)
+# Usage in a workflow:
+#   - uses: ./.github/actions/setup
+
+name: Setup Python & Dependencies
+description: Install uv, Python, and project dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: .python-version
+
+    - name: Install dependencies
+      shell: bash
+      run: uv sync

@@ -1,0 +1,38 @@
+name: API Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Run API tests
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          CI: "true"
+        run: uv run pytest tests/api/ -m "api" --timeout=30
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-report
+          path: test-result/report.html
+          retention-days: 7

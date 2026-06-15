@@ -1,0 +1,167 @@
+# =============================================================================
+# CI/CD Pipeline for aqa-testomat
+# =============================================================================
+# This pipeline runs automatically on every push and pull request.
+# It ensures code quality (lint) and catches bugs early before merging.
+#
+# Pipeline structure:
+#   1. lint   — checks code formatting and style rules
+#   2. test   — runs the API and smoke tests
+# =============================================================================
+
+name: CI
+
+# ─── TRIGGERS ────────────────────────────────────────────────────────────────
+# "on" defines WHEN this pipeline will run.
+# - push: runs when code is pushed to main or develop branches
+# - pull_request: runs when someone opens/updates a PR targeting main
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  # ── workflow_dispatch ────────────────────────────────────────────────────
+  # Allows you to run this pipeline MANUALLY from the GitHub UI at any time.
+  # Go to Actions tab > select "CI" workflow > click "Run workflow" button.
+  # Useful when:
+  #   - You want to re-run tests without pushing a new commit
+  #   - You need to verify the pipeline after adding/changing secrets
+  #   - You want to trigger tests on a specific branch on demand
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - regression
+          - all
+
+# ─── JOBS ────────────────────────────────────────────────────────────────────
+# Jobs run in parallel by default. Each job gets a fresh virtual machine.
+# We use "needs" to make one job wait for another (dependency chain).
+jobs:
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 1: LINT
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Catch formatting issues, unused imports, and code style violations
+  # BEFORE running any tests. This is fast (~10s) and saves CI minutes by
+  # failing early if the code doesn't meet standards.
+  lint:
+    # "runs-on" picks the operating system for this job's virtual machine.
+    # ubuntu-latest is the most common choice — it's free and fast.
+    runs-on: ubuntu-latest
+    if: github.event_name = 'pull_request'
+
+    steps:
+      # ── Step 1: Checkout the code ──────────────────────────────────────────
+      # GitHub Actions runners start with an EMPTY machine. This step clones
+      # your repository so the runner has access to your source code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Step 2: Setup (uv + Python + dependencies) ────────────────────────
+      # Uses our reusable composite action from .github/actions/setup/
+      # This replaces 3 separate steps (install uv, setup python, uv sync).
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      # ── Step 3: Run Ruff format check ─────────────────────────────────────
+      # Ruff is the linter/formatter configured in pyproject.toml.
+      # "ruff format --check" verifies all files are properly formatted
+      # WITHOUT modifying them. If any file differs from expected format,
+      # the step fails and shows which files need formatting.
+      # --diff shows exactly what lines are wrong so you can fix them.
+      - name: Check formatting
+        run: uv run ruff format --check --diff
+
+      # ── Step 6: Run Ruff linter ────────────────────────────────────────────
+      # "ruff check" runs static analysis rules defined in pyproject.toml:
+      #   E/W = pycodestyle errors/warnings
+      #   F   = pyflakes (unused imports, undefined names)
+      #   I   = isort (import ordering)
+      #   B   = bugbear (common bugs)
+      #   UP  = pyupgrade (use modern Python syntax)
+      #   SIM = simplify (unnecessarily complex code)
+      # If any rule is violated, the step fails with file:line:column detail.
+      - name: Run linter
+        run: uv run ruff check
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 2: TEST
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Run the actual test suite to verify nothing is broken.
+  # "needs: lint" means this job ONLY starts after lint passes — no point
+  # running slow tests if the code doesn't even pass basic style checks.
+  smoke-test:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name = 'pull_request' ||
+      (github.event_name = 'workflow_dispatch' &&
+       (inputs.test_suite = 'smoke' || inputs.test_suite = 'all'))
+    needs: lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      # ── Step: Install Playwright browsers ──────────────────────────────────
+      # Playwright needs actual browser binaries (Chromium, Firefox, WebKit)
+      # downloaded to the runner. This step fetches them.
+      # --with-deps also installs OS-level libraries (libglib, libnss, etc.)
+      # that browsers need on headless Linux.
+      - name: Install Playwright browsers
+        run: uv run playwright install chromium --with-deps
+
+      # ── Step: Run tests ────────────────────────────────────────────────────
+      # Runs pytest with markers to select only API and smoke tests.
+      # -m "api or smoke" = only run tests decorated with @pytest.mark.api
+      # or @pytest.mark.smoke (skips slow regression/UI tests in CI).
+      # --timeout=30 overrides the default 60s timeout for faster feedback.
+      #
+      # Environment variables are injected from GitHub Secrets — these are
+      # encrypted values you configure in Settings > Secrets > Actions.
+      # They are NEVER printed in logs.
+      - name: Run smoke tests
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          BASE_APP_URL: ${{ secrets.BASE_APP_URL }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+        run: uv run pytest -m smoke --ignore=tests/web/selenium
+
+      # ── Step: Upload test report ───────────────────────────────────────────
+      # If tests fail, this step uploads the HTML report and traces as a
+      # downloadable artifact. You can find it in the Actions tab > job run >
+      # "Artifacts" section. "if: always()" means this runs even on failure.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: test-result/report.html
+          retention-days: 7
+
+      # ── Step: Upload Playwright traces ─────────────────────────────────────
+      # Traces are recorded during test execution (screenshots, DOM snapshots,
+      # network logs, action timeline). When a test fails, the trace .zip is
+      # saved to test-result/traces/. You can open it at https://trace.playwright.dev
+      # to replay the test step-by-step and see exactly what went wrong.
+      # Only uploads if the traces directory actually has files in it.
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-result/traces/
+          retention-days: 7
+
+

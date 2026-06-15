@@ -15,9 +15,10 @@ TRACES_DIR = PROJECT_ROOT / "test-result" / "traces"
 
 @pytest.fixture(scope="session")
 def browser(playwright: Playwright) -> Browser:
+    is_ci = os.getenv("CI") == "true"
     browser = playwright.chromium.launch(
-        headless=False,
-        slow_mo=300,
+        headless=is_ci,
+        slow_mo=0 if is_ci else 300,
     )
     yield browser
     browser.close()
