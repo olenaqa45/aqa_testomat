@@ -6,7 +6,7 @@
 #
 # Pipeline structure:
 #   1. lint   — checks code formatting and style rules
-#   2. test   — runs the API and smoke tests
+#   2. test   — runs the smoke tests
 # =============================================================================
 
 name: CI
@@ -17,9 +17,9 @@ name: CI
 # - pull_request: runs when someone opens/updates a PR targeting main
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   # ── workflow_dispatch ────────────────────────────────────────────────────
   # Allows you to run this pipeline MANUALLY from the GitHub UI at any time.
   # Go to Actions tab > select "CI" workflow > click "Run workflow" button.
@@ -51,10 +51,8 @@ jobs:
   # BEFORE running any tests. This is fast (~10s) and saves CI minutes by
   # failing early if the code doesn't meet standards.
   lint:
-    # "runs-on" picks the operating system for this job's virtual machine.
-    # ubuntu-latest is the most common choice — it's free and fast.
     runs-on: ubuntu-latest
-    if: github.event_name = 'pull_request'
+    if: github.event_name == 'pull_request'
 
     steps:
       # ── Step 1: Checkout the code ──────────────────────────────────────────
@@ -78,7 +76,7 @@ jobs:
       - name: Check formatting
         run: uv run ruff format --check --diff
 
-      # ── Step 6: Run Ruff linter ────────────────────────────────────────────
+      # ── Step 4: Run Ruff linter ────────────────────────────────────────────
       # "ruff check" runs static analysis rules defined in pyproject.toml:
       #   E/W = pycodestyle errors/warnings
       #   F   = pyflakes (unused imports, undefined names)
@@ -91,17 +89,17 @@ jobs:
         run: uv run ruff check
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # JOB 2: TEST
+  # JOB 2: SMOKE TEST
   # ═══════════════════════════════════════════════════════════════════════════
-  # Purpose: Run the actual test suite to verify nothing is broken.
+  # Purpose: Run the smoke test suite to verify critical paths work.
   # "needs: lint" means this job ONLY starts after lint passes — no point
   # running slow tests if the code doesn't even pass basic style checks.
   smoke-test:
     runs-on: ubuntu-latest
     if: >
-      github.event_name = 'pull_request' ||
-      (github.event_name = 'workflow_dispatch' &&
-       (inputs.test_suite = 'smoke' || inputs.test_suite = 'all'))
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.test_suite == 'smoke' || inputs.test_suite == 'all'))
     needs: lint
 
     steps:
@@ -120,10 +118,8 @@ jobs:
         run: uv run playwright install chromium --with-deps
 
       # ── Step: Run tests ────────────────────────────────────────────────────
-      # Runs pytest with markers to select only API and smoke tests.
-      # -m "api or smoke" = only run tests decorated with @pytest.mark.api
-      # or @pytest.mark.smoke (skips slow regression/UI tests in CI).
-      # --timeout=30 overrides the default 60s timeout for faster feedback.
+      # Runs pytest with the smoke marker to select only critical-path tests.
+      # --ignore=tests/web/selenium excludes Selenium tests (no chromedriver in CI).
       #
       # Environment variables are injected from GitHub Secrets — these are
       # encrypted values you configure in Settings > Secrets > Actions.
@@ -136,12 +132,13 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
           API_TOKEN: ${{ secrets.API_TOKEN }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          CI: "true"
         run: uv run pytest -m smoke --ignore=tests/web/selenium
 
       # ── Step: Upload test report ───────────────────────────────────────────
-      # If tests fail, this step uploads the HTML report and traces as a
-      # downloadable artifact. You can find it in the Actions tab > job run >
-      # "Artifacts" section. "if: always()" means this runs even on failure.
+      # Uploads the HTML report as a downloadable artifact.
+      # You can find it in the Actions tab > job run > "Artifacts" section.
+      # "if: always()" means this runs even on failure.
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -155,7 +152,6 @@ jobs:
       # network logs, action timeline). When a test fails, the trace .zip is
       # saved to test-result/traces/. You can open it at https://trace.playwright.dev
       # to replay the test step-by-step and see exactly what went wrong.
-      # Only uploads if the traces directory actually has files in it.
       - name: Upload Playwright traces
         if: failure()
         uses: actions/upload-artifact@v4
@@ -163,5 +159,3 @@ jobs:
           name: playwright-traces
           path: test-result/traces/
           retention-days: 7
-
-
