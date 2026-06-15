@@ -2,7 +2,7 @@ name: API Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, MNFCT-*]
   pull_request:
     branches: [main]
   workflow_dispatch:

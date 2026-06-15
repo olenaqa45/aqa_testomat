@@ -17,7 +17,7 @@ name: CI
 # - pull_request: runs when someone opens/updates a PR targeting main
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, MNFCT-*]
   pull_request:
     branches: [main]
   # ── workflow_dispatch ────────────────────────────────────────────────────
@@ -55,19 +55,20 @@ jobs:
     if: github.event_name == 'pull_request'
 
     steps:
-      # ── Step 1: Checkout the code ──────────────────────────────────────────
-      # GitHub Actions runners start with an EMPTY machine. This step clones
-      # your repository so the runner has access to your source code.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── Step 2: Setup (uv + Python + dependencies) ────────────────────────
-      # Uses our reusable composite action from .github/actions/setup/
-      # This replaces 3 separate steps (install uv, setup python, uv sync).
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      # ── Step 3: Run Ruff format check ─────────────────────────────────────
+      # ── Step: Validate GitHub Actions workflows ────────────────────────────
+      # actionlint checks .github/workflows/*.yml for syntax errors,
+      # invalid expressions (like = instead of ==), unknown action inputs,
+      # and type mismatches. Catches CI bugs before they run.
+      - name: Lint GitHub Actions workflows
+        uses: rhysd/actionlint@v1
+
+      # ── Step: Run Ruff format check ────────────────────────────────────────
       # Ruff is the linter/formatter configured in pyproject.toml.
       # "ruff format --check" verifies all files are properly formatted
       # WITHOUT modifying them. If any file differs from expected format,
