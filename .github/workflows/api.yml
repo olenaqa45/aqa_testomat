@@ -2,9 +2,9 @@ name: API Tests
 
 on:
   push:
-    branches: [main, develop, MNFCT-*]
+    branches: [ main, develop, MNFCT-* ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           CI: "true"
-        run: uv run pytest tests/api/ -m "api" --timeout=30
+        run: uv run pytest tests/api/ -m "api" --timeout=30 --ignore=tests/web/selenium --ignore=tests/web/selenium
 
       - name: Upload test report
         if: always()
