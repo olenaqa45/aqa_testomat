@@ -71,7 +71,7 @@ jobs:
       # invalid expressions (like = instead of ==), unknown action inputs,
       # and type mismatches. Catches CI bugs before they run.
       - name: Lint GitHub Actions workflows
-        uses: rhysd/actionlint@v1
+        uses: raven-actions/actionlint@v2
 
       # ── Step: Run Ruff format check ────────────────────────────────────────
       # Ruff is the linter/formatter configured in pyproject.toml.
