@@ -79,11 +79,7 @@ class TestInput(BaseModel):
     emoji: str | None = None
     suite_id: str = Field(..., description="Public UID of the parent suite")
     priority: Priority | None = None
-    assigned_to: str | None = Field(
-        None, description="Email address of a non-readonly project member to assign."
-    )
+    assigned_to: str | None = Field(None, description="Email address of a non-readonly project member to assign.")
     code: str | None = None
     state: str | None = None
-    link: list[LinkAction] | None = Field(
-        None, description="Add/remove labels, tags, issues, or jira links"
-    )
+    link: list[LinkAction] | None = Field(None, description="Add/remove labels, tags, issues, or jira links")

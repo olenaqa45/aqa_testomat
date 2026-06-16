@@ -46,7 +46,6 @@ invalid_login_data = [
     pytest.param(VALID_EMAIL, EMPTY, id="valid_email_empty_password"),
     # pytest.param(SPACES_ONLY, VALID_PASSWORD, id="spaces_email"),
     # pytest.param(VALID_EMAIL, SPACES_ONLY, id="spaces_password"),
-
     # Invalid email format
     # pytest.param(NO_AT, VALID_PASSWORD, id="email_no_at_sign"),
     # pytest.param(NO_DOMAIN, VALID_PASSWORD, id="email_no_domain"),
@@ -60,12 +59,10 @@ invalid_login_data = [
     pytest.param(FAKE_EMAIL, VALID_PASSWORD, id="wrong_email_valid_password"),
     pytest.param(VALID_EMAIL, FAKE_PASSWORD, id="valid_email_wrong_password"),
     pytest.param(FAKE_EMAIL, FAKE_PASSWORD, id="wrong_email_wrong_password"),
-
     # Boundary: password length
     pytest.param(VALID_EMAIL, ONE_CHAR_PASSWORD, id="password_1_char"),
     # pytest.param(VALID_EMAIL, SHORT_PASSWORD, id="password_too_short"),
     # pytest.param(VALID_EMAIL, LONG_PASSWORD, id="password_too_long"),
-
     # Security
     pytest.param(SQL_INJECTION, VALID_PASSWORD, id="sql_injection_email"),
     pytest.param(VALID_EMAIL, SQL_INJECTION, id="sql_injection_password"),

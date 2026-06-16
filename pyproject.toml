@@ -26,6 +26,7 @@ minversion = "8.0"
 testpaths = ["tests"]
 python_files = ["*_test.py", "test_*.py", "*_tests.py"]
 python_functions = ["test_*"]
+python_classes = [""]
 addopts = [
     "-v",
     "-ra",
