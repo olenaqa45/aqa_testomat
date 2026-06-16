@@ -30,6 +30,7 @@ def test_new_project_creation(logged_app: App):
     (logged_app.project_page.side_bar.open().should_be_loaded().click_logo())
 
 
+@pytest.mark.smoke
 def test_open_project_and_create_from_side_bar(projects_api, logged_app: App):
     response = projects_api.get_projects()
     all_projects = response.json()["data"]
