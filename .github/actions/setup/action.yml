@@ -15,9 +15,7 @@ runs:
         enable-cache: true
 
     - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version-file: .python-version
+      run: uv python install 3.14
 
     - name: Install dependencies
       shell: bash

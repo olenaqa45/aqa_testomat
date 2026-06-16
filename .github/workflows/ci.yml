@@ -42,7 +42,7 @@ on:
 # ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 # Force all JavaScript-based actions to run on Node.js 24 (removes deprecation warning).
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 # ─── JOBS ────────────────────────────────────────────────────────────────────
 # Jobs run in parallel by default. Each job gets a fresh virtual machine.
