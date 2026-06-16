@@ -101,10 +101,12 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     if: >
+      always() && !failure() && (
       github.event_name == 'push' ||
       github.event_name == 'pull_request' ||
       (github.event_name == 'workflow_dispatch' &&
        (inputs.test_suite == 'smoke' || inputs.test_suite == 'all'))
+      )
     needs: lint
 
     steps:
