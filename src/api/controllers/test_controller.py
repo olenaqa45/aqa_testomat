@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import httpx
-from pydantic import ValidationError
 
 from api.controllers.base_controller import BaseController
 from api.models.test import TestInput

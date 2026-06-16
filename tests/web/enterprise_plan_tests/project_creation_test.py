@@ -3,7 +3,6 @@ import random
 import pytest
 from faker import Faker
 
-from api.api_client import ApiClient
 from web.app import App
 
 

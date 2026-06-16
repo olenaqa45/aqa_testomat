@@ -54,6 +54,7 @@ log_cli_level = "INFO"
 [dependency-groups]
 dev = [
     "datamodel-code-generator>=0.59.1",
+    "pre-commit>=4.6.0",
     "ruff>=0.15.11",
 ]
 

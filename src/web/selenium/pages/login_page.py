@@ -3,7 +3,6 @@ from typing import Self
 from selenium.webdriver.common.by import By
 
 from web.selenium.core.base_page import BasePage
-from web.selenium.core.waits import Selector
 
 EMAIL_INPUT = (By.CSS_SELECTOR, "#content-desktop #user_email")
 PASSWORD_INPUT = (By.CSS_SELECTOR, "#content-desktop #user_password")
