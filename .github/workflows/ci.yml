@@ -57,7 +57,7 @@ jobs:
   # failing early if the code doesn't meet standards.
   lint:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
 
     steps:
       - name: Checkout repository
@@ -103,6 +103,7 @@ jobs:
   smoke-test:
     runs-on: ubuntu-latest
     if: >
+      github.event_name == 'push' ||
       github.event_name == 'pull_request' ||
       (github.event_name == 'workflow_dispatch' &&
        (inputs.test_suite == 'smoke' || inputs.test_suite == 'all'))

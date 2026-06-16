@@ -15,6 +15,7 @@ runs:
         enable-cache: true
 
     - name: Set up Python
+      shell: bash
       run: uv python install 3.14
 
     - name: Install dependencies
