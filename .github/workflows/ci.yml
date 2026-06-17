@@ -181,22 +181,13 @@ jobs:
       - name: Download smoke HTML report
         uses: actions/download-artifact@v4
         with:
-          path: test-result/
+          name: smoke-test-results
+          path: pages/
 
-      - name: Prepare Pages content
-        run: |
-          mkdir -p pages
-          if [-f report/smoke/report.html ]; then
-          cp report/smokie/report.html pages/index.html
-          fi
-
-      - name: Configure pages
-        run: actions/configure-pages@v5
-
-      - name: Upload pages artifact
-        uses: actions/upload-[ages-artifact@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: pages
+          path: pages/
 
       - name: Deploy to GitHub Pages
         id: deploy

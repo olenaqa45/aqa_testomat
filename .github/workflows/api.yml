@@ -57,10 +57,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
+      - name: Download API HTML report
+        uses: actions/download-artifact@v4
+        with:
+          name: api-test-report
+          path: pages/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: test-result/
+          path: pages/
 
       - name: Deploy to GitHub Pages
         id: deploy
