@@ -63,6 +63,11 @@ jobs:
           name: api-test-report
           path: pages/
 
+      - name: Prepare report
+        run: |
+          ls -la pages/
+          cp pages/report.html pages/index.html || true
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
