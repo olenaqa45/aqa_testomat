@@ -140,7 +140,7 @@ jobs:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           CI: "true"
-        run: uv run pytest -m smoke --ignore=tests/web/selenium
+        run: uv run pytest -m smoke
 
       # ── Step: Upload test report ───────────────────────────────────────────
       # Uploads the HTML report as a downloadable artifact.

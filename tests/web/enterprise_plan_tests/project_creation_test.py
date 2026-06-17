@@ -44,6 +44,6 @@ def test_open_project_and_create_from_side_bar(projects_api, logged_app: App):
 
     test_name = Faker().sentence()
     logged_app.project_page.side_bar.tests_link.click()
-    logged_app.project_page.first_suite_input.fill(test_name)
+    logged_app.project_page.first_suite_input.fill(test_name, timeout=10000)
     logged_app.project_page.suite_btn_is_visible()
     print(test_name)

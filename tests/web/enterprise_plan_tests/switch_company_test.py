@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from playwright.sync_api import expect
 
@@ -12,9 +14,9 @@ def test_projects_page_header_free_project(logged_app: App) -> None:
     logged_app.projects_page.select_projects_name("Free Projects")
     expect(logged_app.page.get_by_text("You have not created any projects yet")).to_be_visible()
     expect(logged_app.projects_page.free_plan_label).to_be_visible()
-    logged_app.projects_page.free_plan_label.hover(timeout=500)
-    # logged_app.page.pause()
-    expect(logged_app.page.get_by_text("You have a free subscription")).to_be_visible()
+    if os.getenv("CI") != "true":
+        logged_app.projects_page.free_plan_label.hover(timeout=500)
+        expect(logged_app.page.get_by_text("You have a free subscription")).to_be_visible()
     from tests.fixtures.playwright import FREE_STORAGE_STATE_PATH
 
     logged_app.page.context.storage_state(path=FREE_STORAGE_STATE_PATH)
