@@ -12,6 +12,7 @@ from web.selenium.pages.login_page import LoginPage
 TARGET_PROJECT: str = "Jacobson LLC"
 
 
+@pytest.mark.regression
 def test_login_search_and_open_project(driver: WebDriver, configs: Config):
     wait = WebDriverWait(driver, 10, ignored_exceptions=[NoSuchElementException, StaleElementReferenceException])
 
