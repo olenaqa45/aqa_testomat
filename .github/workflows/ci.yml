@@ -151,7 +151,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: smoke-test-results
-          path: test-result/report.html
+          path: |
+            test-result/report.html
+            test-result/assets/
           retention-days: 7
 
       # ── Step: Upload Playwright traces ─────────────────────────────────────
@@ -204,7 +206,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: regression-test-results
-          path: test-result/report.html
+          path: |
+            test-result/report.html
+            test-result/assets/
           retention-days: 7
 
       - name: Upload Playwright traces
@@ -241,6 +245,18 @@ jobs:
           name: regression-test-results
           path: pages/regression/
         continue-on-error: true
+
+      - name: Prepare pages structure
+        run: |
+          # Move files from test-result/ subfolder to root of each report dir
+          if [ -d pages/smoke/test-result ]; then
+            mv pages/smoke/test-result/* pages/smoke/
+            rm -rf pages/smoke/test-result
+          fi
+          if [ -d pages/regression/test-result ]; then
+            mv pages/regression/test-result/* pages/regression/
+            rm -rf pages/regression/test-result
+          fi
 
       - name: Prepare index page
         run: |

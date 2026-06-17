@@ -46,33 +46,4 @@ jobs:
           path: test-result/report.html
           retention-days: 7
 
-  publish-report:
-    runs-on: ubuntu-latest
-    needs: api-tests
-    if: always()
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - name: Download API HTML report
-        uses: actions/download-artifact@v4
-        with:
-          name: api-test-report
-          path: pages/
 
-      - name: Prepare report
-        run: |
-          ls -la pages/
-          cp pages/report.html pages/index.html || true
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages/
-
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
