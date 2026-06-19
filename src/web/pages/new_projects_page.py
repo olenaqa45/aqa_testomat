@@ -1,5 +1,6 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 from web.pages.project_page import ProjectPage
@@ -21,10 +22,12 @@ class NewProjectsPage:
         self.create_demo_btn = self._container.locator('form[action="/projects/create_demo"] input[type="submit"]')
         self.how_to_start_link = self._container.locator("a", has_text="How to start?")
 
+    @allure.step("Open new project page")
     def open(self) -> Self:
         self.page.goto("/projects/new")
         return self
 
+    @allure.step("Verify new project page is loaded")
     def should_be_loaded(self) -> Self:
         expect(self.page_title).to_have_text("New Project")
         expect(self._form).to_be_visible()
@@ -35,34 +38,42 @@ class NewProjectsPage:
         expect(self.create_btn).to_be_visible()
         return self
 
+    @allure.step("Select classical project type")
     def select_classical(self) -> Self:
         self.classical_btn.click()
         return self
 
+    @allure.step("Select BDD project type")
     def select_bdd(self) -> Self:
         self.bdd_btn.click()
         return self
 
+    @allure.step("Fill project title: {title}")
     def fill_project_title(self, title: str) -> Self:
         self.project_title_input.fill(title)
         return self
 
+    @allure.step("Toggle demo data")
     def toggle_demo_data(self) -> Self:
         self.demo_btn.click()
         return self
 
+    @allure.step("Select demo project: {name}")
     def select_demo_project(self, name: str) -> Self:
         self._container.locator("#demo-form button", has_text=name).click()
         return self
 
+    @allure.step("Click create project")
     def click_create(self) -> ProjectPage:
         self.create_btn.click()
         return ProjectPage(self.page)
 
+    @allure.step("Click create demo project")
     def click_create_demo(self) -> Self:
         self.create_demo_btn.click()
         return self
 
+    @allure.step("Click 'How to start?' link")
     def click_how_to_start(self) -> Self:
         self.how_to_start_link.click()
         return self

@@ -1,5 +1,6 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
@@ -28,11 +29,13 @@ class Sidebar:
         self.projects_link = self._container.get_by_role("link", name="Projects")
         self.user_profile_link = self._container.locator("a").last
 
+    @allure.step("Open sidebar")
     def open(self) -> Self:
         self.open_btn.click(force=True)
         expect(self.page.locator(".mainnav-menu-expanded")).to_be_visible()
         return self
 
+    @allure.step("Verify sidebar is loaded")
     def should_be_loaded(self) -> Self:
         expect(self.tests_link).to_be_visible()
         expect(self.requirements_link).to_be_visible()
@@ -48,6 +51,7 @@ class Sidebar:
         expect(self.projects_link).to_be_visible()
         return self
 
+    @allure.step("Click logo")
     def click_logo(self) -> Self:
         self.logo_link.click()
         return self

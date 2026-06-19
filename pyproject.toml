@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "UI test automation framework for Testomat.io"
 requires-python = ">=3.14"
 dependencies = [
+    "allure-pytest==2.13.5",
     "faker==40.12.0",
     "httpx==0.28.1",
     "playwright==1.58.0",
@@ -33,6 +34,8 @@ addopts = [
     "--strict-markers",
     "--tb=short",
     "--html=test-result/report.html",
+    "--alluredir=test-result/allure-results",
+    "--clean-alluredir",
 ]
 base_url = "https://app.testomat.io"
 pythonpath = ["src"]

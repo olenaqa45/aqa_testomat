@@ -8,26 +8,17 @@ name: CI smoke test
 # Pipeline structure:
 #   1. lint   — checks code formatting and style rules
 #   2. test   — runs the smoke tests
+#   3. report — publishes Allure report to GitHub Pages
 # =============================================================================
 
 
 
 # ─── TRIGGERS ────────────────────────────────────────────────────────────────
-# "on" defines WHEN this pipeline will run.
-# - push: runs when code is pushed to main or develop branches
-# - pull_request: runs when someone opens/updates a PR targeting main
 on:
   push:
     branches: [ main, develop, MNFCT-* ]
   pull_request:
     branches: [ main ]
-  # ── workflow_dispatch ────────────────────────────────────────────────────
-  # Allows you to run this pipeline MANUALLY from the GitHub UI at any time.
-  # Go to Actions tab > select "CI" workflow > click "Run workflow" button.
-  # Useful when:
-  #   - You want to re-run tests without pushing a new commit
-  #   - You need to verify the pipeline after adding/changing secrets
-  #   - You want to trigger tests on a specific branch on demand
   workflow_dispatch:
     inputs:
       test_suite:
@@ -40,19 +31,12 @@ on:
           - regression
           - all
 
-# ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
-# Force all JavaScript-based actions to run on Node.js 24 (removes deprecation warning).
 # ─── JOBS ────────────────────────────────────────────────────────────────────
-# Jobs run in parallel by default. Each job gets a fresh virtual machine.
-# We use "needs" to make one job wait for another (dependency chain).
 jobs:
 
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 1: LINT
   # ═══════════════════════════════════════════════════════════════════════════
-  # Purpose: Catch formatting issues, unused imports, and code style violations
-  # BEFORE running any tests. This is fast (~10s) and saves CI minutes by
-  # failing early if the code doesn't meet standards.
   lint:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -64,40 +48,18 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      # ── Step: Validate GitHub Actions workflows ────────────────────────────
-      # actionlint checks .github/workflows/*.yml for syntax errors,
-      # invalid expressions (like = instead of ==), unknown action inputs,
-      # and type mismatches. Catches CI bugs before they run.
       - name: Lint GitHub Actions workflows
         uses: raven-actions/actionlint@v2
 
-      # ── Step: Run Ruff format check ────────────────────────────────────────
-      # Ruff is the linter/formatter configured in pyproject.toml.
-      # "ruff format --check" verifies all files are properly formatted
-      # WITHOUT modifying them. If any file differs from expected format,
-      # the step fails and shows which files need formatting.
-      # --diff shows exactly what lines are wrong so you can fix them.
       - name: Check formatting
         run: uv run ruff format --check --diff
 
-      # ── Step 4: Run Ruff linter ────────────────────────────────────────────
-      # "ruff check" runs static analysis rules defined in pyproject.toml:
-      #   E/W = pycodestyle errors/warnings
-      #   F   = pyflakes (unused imports, undefined names)
-      #   I   = isort (import ordering)
-      #   B   = bugbear (common bugs)
-      #   UP  = pyupgrade (use modern Python syntax)
-      #   SIM = simplify (unnecessarily complex code)
-      # If any rule is violated, the step fails with file:line:column detail.
       - name: Run linter
         run: uv run ruff check
 
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 2: SMOKE TEST
   # ═══════════════════════════════════════════════════════════════════════════
-  # Purpose: Run the smoke test suite to verify critical paths work.
-  # "needs: lint" means this job ONLY starts after lint passes — no point
-  # running slow tests if the code doesn't even pass basic style checks.
   smoke-test:
     runs-on: ubuntu-latest
     if: >
@@ -116,21 +78,9 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      # ── Step: Install Playwright browsers ──────────────────────────────────
-      # Playwright needs actual browser binaries (Chromium, Firefox, WebKit)
-      # downloaded to the runner. This step fetches them.
-      # --with-deps also installs OS-level libraries (libglib, libnss, etc.)
-      # that browsers need on headless Linux.
       - name: Install Playwright browsers
         run: uv run playwright install chromium --with-deps
 
-      # ── Step: Run tests ────────────────────────────────────────────────────
-      # Runs pytest with the smoke marker to select only critical-path tests.
-      # --ignore=tests/web/selenium excludes Selenium tests (no chromedriver in CI).
-      #
-      # Environment variables are injected from GitHub Secrets — these are
-      # encrypted values you configure in Settings > Secrets > Actions.
-      # They are NEVER printed in logs.
       - name: Run smoke tests
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
@@ -142,25 +92,14 @@ jobs:
           CI: "true"
         run: uv run pytest -m smoke
 
-      # ── Step: Upload test report ───────────────────────────────────────────
-      # Uploads the HTML report as a downloadable artifact.
-      # You can find it in the Actions tab > job run > "Artifacts" section.
-      # "if: always()" means this runs even on failure.
-      - name: Upload test results
+      - name: Upload allure results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: smoke-test-results
-          path: |
-            test-result/report.html
-            test-result/assets/
+          name: smoke-allure-results
+          path: test-result/allure-results/
           retention-days: 7
 
-      # ── Step: Upload Playwright traces ─────────────────────────────────────
-      # Traces are recorded during test execution (screenshots, DOM snapshots,
-      # network logs, action timeline). When a test fails, the trace .zip is
-      # saved to test-result/traces/. You can open it at https://trace.playwright.dev
-      # to replay the test step-by-step and see exactly what went wrong.
       - name: Upload Playwright traces
         if: failure()
         uses: actions/upload-artifact@v7
@@ -169,6 +108,9 @@ jobs:
           path: test-result/traces/
           retention-days: 7
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 3: REGRESSION TEST
+  # ═══════════════════════════════════════════════════════════════════════════
   regression-test:
     runs-on: ubuntu-latest
     needs: smoke-test
@@ -201,14 +143,12 @@ jobs:
           CI: "true"
         run: uv run pytest -m regression --ignore=tests/web/selenium
 
-      - name: Upload test results
+      - name: Upload allure results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: regression-test-results
-          path: |
-            test-result/report.html
-            test-result/assets/
+          name: regression-allure-results
+          path: test-result/allure-results/
           retention-days: 7
 
       - name: Upload Playwright traces
@@ -219,6 +159,9 @@ jobs:
           path: test-result/traces/
           retention-days: 7
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # JOB 4: PUBLISH ALLURE REPORT
+  # ═══════════════════════════════════════════════════════════════════════════
   publish-report:
     runs-on: ubuntu-latest
     needs: [smoke-test, regression-test]
@@ -229,53 +172,49 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
-      - name: Download smoke HTML report
-        if: always()
+      - name: Install Allure CLI
+        run: |
+          curl -sL https://github.com/allure-framework/allure2/releases/download/2.32.0/allure-2.32.0.tgz | tar -xz
+          echo "$PWD/allure-2.32.0/bin" >> "$GITHUB_PATH"
+
+      - name: Download smoke allure results
         uses: actions/download-artifact@v4
         with:
-          name: smoke-test-results
-          path: pages/smoke/
+          name: smoke-allure-results
+          path: allure-results/
         continue-on-error: true
 
-      - name: Download regression HTML report
-        if: always()
+      - name: Download regression allure results
         uses: actions/download-artifact@v4
         with:
-          name: regression-test-results
-          path: pages/regression/
+          name: regression-allure-results
+          path: allure-results/
         continue-on-error: true
 
-      - name: Prepare pages structure
-        run: |
-          # Move files from test-result/ subfolder to root of each report dir
-          if [ -d pages/smoke/test-result ]; then
-            mv pages/smoke/test-result/* pages/smoke/
-            rm -rf pages/smoke/test-result
-          fi
-          if [ -d pages/regression/test-result ]; then
-            mv pages/regression/test-result/* pages/regression/
-            rm -rf pages/regression/test-result
-          fi
+      - name: Download previous report history
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-history
+          path: allure-results/history/
+        continue-on-error: true
 
-      - name: Prepare index page
-        run: |
-          cat > pages/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html><head><title>Test Reports</title></head>
-          <body>
-            <h1>Test Reports</h1>
-            <ul>
-              <li><a href="smoke/report.html">Smoke Test Report</a></li>
-              <li><a href="regression/report.html">Regression Test Report</a></li>
-            </ul>
-          </body></html>
-          EOF
+      - name: Generate Allure report
+        run: allure generate allure-results -o allure-report --clean
+
+      - name: Save history for next run
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-history
+          path: allure-report/history/
+          retention-days: 30
+          overwrite: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: pages/
+          path: allure-report/
 
       - name: Deploy to GitHub Pages
         id: deploy

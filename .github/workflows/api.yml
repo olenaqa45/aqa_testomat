@@ -1,8 +1,6 @@
 name: API Tests
 
 on:
-  push:
-    branches: [ main, develop, MNFCT-* ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -45,5 +43,3 @@ jobs:
           name: api-test-report
           path: test-result/report.html
           retention-days: 7
-
-
