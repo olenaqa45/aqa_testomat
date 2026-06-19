@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "UI test automation framework for Testomat.io"
 requires-python = ">=3.14"
 dependencies = [
+    "allure-pytest==2.13.5",
     "faker==40.12.0",
     "httpx==0.28.1",
     "playwright==1.58.0",
@@ -26,12 +27,15 @@ minversion = "8.0"
 testpaths = ["tests"]
 python_files = ["*_test.py", "test_*.py", "*_tests.py"]
 python_functions = ["test_*"]
+python_classes = [""]
 addopts = [
     "-v",
     "-ra",
     "--strict-markers",
     "--tb=short",
     "--html=test-result/report.html",
+    "--alluredir=test-result/allure-results",
+    "--clean-alluredir",
 ]
 base_url = "https://app.testomat.io"
 pythonpath = ["src"]
@@ -53,6 +57,7 @@ log_cli_level = "INFO"
 [dependency-groups]
 dev = [
     "datamodel-code-generator>=0.59.1",
+    "pre-commit>=4.6.0",
     "ruff>=0.15.11",
 ]
 

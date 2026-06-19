@@ -4,7 +4,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from api.models.test import Action, LabelAttachment, LinkAction, LinkType
+from api.models.test import LabelAttachment, LinkAction
 
 
 class SuiteType(Enum):

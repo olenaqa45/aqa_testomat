@@ -30,17 +30,13 @@ def project_controller(configs: Config) -> ProjectController:
 
 @pytest.fixture(scope="session")
 def test_controller(configs: Config) -> TestController:
-    controller = TestController(
-        base_url=configs.login_url, api_token=configs.api_token, project_id=configs.project_id
-    )
+    controller = TestController(base_url=configs.login_url, api_token=configs.api_token, project_id=configs.project_id)
     yield controller
     controller.close()
 
 
 @pytest.fixture(scope="session")
 def suite_controller(configs: Config) -> SuiteController:
-    controller = SuiteController(
-        base_url=configs.login_url, api_token=configs.api_token, project_id=configs.project_id
-    )
+    controller = SuiteController(base_url=configs.login_url, api_token=configs.api_token, project_id=configs.project_id)
     yield controller
     controller.close()

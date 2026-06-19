@@ -1,5 +1,6 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
@@ -8,16 +9,19 @@ class HomePage:
         self.page = page
         self._base_url = base_url
 
+    @allure.step("Open home page")
     def open(self) -> Self:
         self.page.goto(self._base_url)
         return self
 
+    @allure.step("Verify home page is loaded")
     def should_be_loaded(self) -> Self:
         expect(self.page.locator("#headerMenuWrapper")).to_be_visible()
         expect(self.page.locator(".side-menu .login-item")).to_have_text("Log in")
         expect(self.page.locator(".side-menu .start-item")).to_have_text("Start for free")
         return self
 
+    @allure.step("Click login")
     def click_login(self) -> Self:
         self.page.get_by_text("Log in", exact=True).click()
         return self

@@ -1,10 +1,10 @@
 from typing import Self
 
+import allure
 from playwright.sync_api import Page, expect
 
 
 class LoginPage:
-
     def __init__(self, page: Page):
         self.page = page
         self._container = page.locator("#content-desktop")
@@ -22,44 +22,54 @@ class LoginPage:
         self.forgot_password_link = self._container.locator('a[href="/users/password/new"]')
         self.invalid_login_msg = self._container.get_by_text("Invalid email or password.")
 
+    @allure.step("Open login page")
     def open(self) -> Self:
         self.page.goto("/users/sign_in")
         return self
 
+    @allure.step("Verify login page is loaded")
     def should_be_loaded(self) -> Self:
         expect(self.form).to_be_visible()
         return self
 
+    @allure.step("Login with email: {email}")
     def login_user(self, email: str, password: str) -> Self:
         self.email_input.fill(email)
         self.password_input.fill(password)
         self.sign_in_btn.click()
         return self
 
+    @allure.step("Login with Google")
     def login_with_google(self) -> Self:
         self.google_btn.click()
         return self
 
+    @allure.step("Login with GitHub")
     def login_with_github(self) -> Self:
         self.github_btn.click()
         return self
 
+    @allure.step("Login with SSO")
     def login_with_sso(self) -> Self:
         self.sso_btn.click()
         return self
 
+    @allure.step("Click sign up link")
     def click_sign_up(self) -> Self:
         self.sign_up_link.click()
         return self
 
+    @allure.step("Click forgot password link")
     def click_forgot_password(self) -> Self:
         self.forgot_password_link.click()
         return self
 
+    @allure.step("Set remember me: {checked}")
     def set_remember_me(self, checked: bool = True) -> Self:
         self.remember_me.set_checked(checked)
         return self
 
+    @allure.step("Verify invalid login message is visible")
     def invalid_login_message_visible(self) -> Self:
         expect(self.invalid_login_msg).to_be_visible()
         return self

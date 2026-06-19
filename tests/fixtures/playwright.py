@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import allure
 import pytest
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
@@ -15,9 +16,10 @@ TRACES_DIR = PROJECT_ROOT / "test-result" / "traces"
 
 @pytest.fixture(scope="session")
 def browser(playwright: Playwright) -> Browser:
+    is_ci = os.getenv("CI") == "true"
     browser = playwright.chromium.launch(
-        headless=False,
-        slow_mo=300,
+        headless=is_ci,
+        slow_mo=0 if is_ci else 300,
     )
     yield browser
     browser.close()
@@ -92,7 +94,9 @@ def save_screenshot(page: Page, request: pytest.FixtureRequest) -> None:
     failed = request.node.rep_call.failed if hasattr(request.node, "rep_call") else False
     if failed:
         TRACES_DIR.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(TRACES_DIR / f"{request.node.name}.png"))
+        screenshot_path = str(TRACES_DIR / f"{request.node.name}.png")
+        page.screenshot(path=screenshot_path)
+        allure.attach.file(screenshot_path, name="screenshot", attachment_type=allure.attachment_type.PNG)
 
 
 def save_video(page: Page, request: pytest.FixtureRequest) -> None:
@@ -101,7 +105,9 @@ def save_video(page: Page, request: pytest.FixtureRequest) -> None:
     if video:
         if failed:
             TRACES_DIR.mkdir(parents=True, exist_ok=True)
-            video.save_as(str(TRACES_DIR / f"{request.node.name}.webm"))
+            video_path = str(TRACES_DIR / f"{request.node.name}.webm")
+            video.save_as(video_path)
+            allure.attach.file(video_path, name="video", attachment_type=allure.attachment_type.WEBM)
         else:
             video.delete()
 

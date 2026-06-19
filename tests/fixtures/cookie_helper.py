@@ -20,7 +20,6 @@ def remove_cookie(storage_state_path: str, name: str) -> str:
     with open(storage_state_path) as f:
         data = json.load(f)
     data["cookies"] = [c for c in data["cookies"] if c["name"] != name]
-    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
-    json.dump(data, tmp)
-    tmp.close()
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+        json.dump(data, tmp)
     return tmp.name

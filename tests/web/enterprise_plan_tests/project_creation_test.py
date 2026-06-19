@@ -3,7 +3,6 @@ import random
 import pytest
 from faker import Faker
 
-from api.api_client import ApiClient
 from web.app import App
 
 
@@ -30,6 +29,7 @@ def test_new_project_creation(logged_app: App):
     (logged_app.project_page.side_bar.open().should_be_loaded().click_logo())
 
 
+@pytest.mark.smoke
 def test_open_project_and_create_from_side_bar(projects_api, logged_app: App):
     response = projects_api.get_projects()
     all_projects = response.json()["data"]
@@ -44,6 +44,6 @@ def test_open_project_and_create_from_side_bar(projects_api, logged_app: App):
 
     test_name = Faker().sentence()
     logged_app.project_page.side_bar.tests_link.click()
-    logged_app.project_page.first_suite_input.fill(test_name)
+    logged_app.project_page.first_suite_input.fill(test_name, timeout=10000)
     logged_app.project_page.suite_btn_is_visible()
     print(test_name)
