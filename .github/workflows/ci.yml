@@ -6,14 +6,22 @@ name: CI smoke test
 # It ensures code quality (lint) and catches bugs early before merging.
 #
 # Pipeline structure:
-#   1. lint   — checks code formatting and style rules
-#   2. test   — runs the smoke tests
-#   3. report — publishes Allure report to GitHub Pages
+#   1. lint            — checks code formatting and style rules
+#   2. smoke-test      — runs smoke tests (critical path)
+#   3. regression-test — runs full regression suite
+#   4. publish-report  — generates Allure report and deploys to GitHub Pages
+#
+# Prerequisites:
+#   - GitHub Pages enabled in repo settings (source: GitHub Actions)
+#   - Secrets configured: BASE_URL, BASE_APP_URL, EMAIL, PASSWORD, API_TOKEN, PROJECT_ID
 # =============================================================================
 
 
 
 # ─── TRIGGERS ────────────────────────────────────────────────────────────────
+# - push: runs when code is pushed to main, develop, or feature branches
+# - pull_request: runs when someone opens/updates a PR targeting main
+# - workflow_dispatch: allows manual trigger from GitHub UI with test suite selection
 on:
   push:
     branches: [ main, develop, MNFCT-* ]
@@ -37,6 +45,8 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 1: LINT
   # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Catch formatting issues, unused imports, and code style violations
+  # BEFORE running any tests. Fast (~10s) and saves CI minutes by failing early.
   lint:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -48,18 +58,25 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
+      # actionlint checks .github/workflows/*.yml for syntax errors,
+      # invalid expressions, unknown action inputs, and type mismatches.
       - name: Lint GitHub Actions workflows
         uses: raven-actions/actionlint@v2
 
+      # Verifies all files match Ruff formatting without modifying them.
       - name: Check formatting
         run: uv run ruff format --check --diff
 
+      # Runs static analysis rules defined in pyproject.toml (E/W/F/I/B/UP/SIM/RUF).
       - name: Run linter
         run: uv run ruff check
 
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 2: SMOKE TEST
   # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Run smoke tests to verify critical paths work.
+  # Only starts after lint passes — no point running slow tests if code
+  # doesn't meet basic style checks.
   smoke-test:
     runs-on: ubuntu-latest
     if: >
@@ -78,9 +95,12 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
+      # Downloads Chromium binary + OS-level deps (libglib, libnss, etc.)
       - name: Install Playwright browsers
         run: uv run playwright install chromium --with-deps
 
+      # Runs pytest with smoke marker. Allure results are written to
+      # test-result/allure-results/ via --alluredir in pyproject.toml addopts.
       - name: Run smoke tests
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
@@ -92,6 +112,7 @@ jobs:
           CI: "true"
         run: uv run pytest -m smoke
 
+      # Upload Allure JSON results for the publish-report job to consume.
       - name: Upload allure results
         if: always()
         uses: actions/upload-artifact@v7
@@ -100,6 +121,8 @@ jobs:
           path: test-result/allure-results/
           retention-days: 7
 
+      # Playwright traces contain screenshots, DOM snapshots, and network logs.
+      # Open at https://trace.playwright.dev to replay failed tests step-by-step.
       - name: Upload Playwright traces
         if: failure()
         uses: actions/upload-artifact@v7
@@ -111,6 +134,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 3: REGRESSION TEST
   # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Run the full regression suite after smoke tests pass.
   regression-test:
     runs-on: ubuntu-latest
     needs: smoke-test
@@ -162,6 +186,9 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   # JOB 4: PUBLISH ALLURE REPORT
   # ═══════════════════════════════════════════════════════════════════════════
+  # Purpose: Merge allure results from smoke + regression, generate a unified
+  # Allure report with history/trends, and deploy it to GitHub Pages.
+  # Runs regardless of test outcome so you always get a report.
   publish-report:
     runs-on: ubuntu-latest
     needs: [smoke-test, regression-test]
@@ -174,11 +201,13 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
+      # Install Allure CLI to generate the static HTML report.
       - name: Install Allure CLI
         run: |
           curl -sL https://github.com/allure-framework/allure2/releases/download/2.32.0/allure-2.32.0.tgz | tar -xz
           echo "$PWD/allure-2.32.0/bin" >> "$GITHUB_PATH"
 
+      # Download JSON results from both test jobs into a single directory.
       - name: Download smoke allure results
         uses: actions/download-artifact@v4
         with:
@@ -193,6 +222,8 @@ jobs:
           path: allure-results/
         continue-on-error: true
 
+      # History from the previous run enables trend graphs in the report.
+      # The artifact persists for 30 days across workflow runs.
       - name: Download previous report history
         uses: actions/download-artifact@v4
         with:
@@ -200,9 +231,11 @@ jobs:
           path: allure-results/history/
         continue-on-error: true
 
+      # Generate the static Allure report from merged results.
       - name: Generate Allure report
         run: allure generate allure-results -o allure-report --clean
 
+      # Persist history so the next run can show trends.
       - name: Save history for next run
         uses: actions/upload-artifact@v7
         with:
@@ -211,6 +244,7 @@ jobs:
           retention-days: 30
           overwrite: true
 
+      # Deploy the generated report to GitHub Pages.
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
